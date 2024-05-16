@@ -5,14 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,21 +26,18 @@ import com.reynaldo.horoscopoapp.ui.theme.Primary
 import com.reynaldo.horoscopoapp.ui.theme.Secondary
 
 
-
 @Composable
- fun ListaSignosSodicacoScreen(
+fun ListaSignosSodicacoScreen(
     navController: NavHostController,
     innerPadding: PaddingValues,
     listaSignos: List<HoroscopeInfo>
 ) {
-
-
-
-        ListaSignos(navController,innerPadding,listaSignos)
+    ListaSignos(navController, innerPadding, listaSignos)
 }
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
+
 @Composable
 fun ListaSignos(
     navController: NavHostController,
@@ -49,38 +45,21 @@ fun ListaSignos(
     listaSignos: List<HoroscopeInfo>
 ) {
 
-    Box(
-        Modifier
-            .background(Primary)
-            .padding(innerPadding)
-            .fillMaxSize()){
+    LazyVerticalGrid(
+
+       columns= GridCells.Fixed(3),
+        verticalArrangement=Arrangement.Center,
+        horizontalArrangement = Arrangement.Absolute.Center,
+        modifier = Modifier.fillMaxSize().background(Primary)
 
 
-    Row(horizontalArrangement = Arrangement.SpaceAround,
-        modifier = Modifier.fillMaxWidth(),
+    ) {
 
-        ) {
 
-            Column(verticalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier.fillMaxHeight()) {
-                RecipeCard(navController,listaSignos.get(0))
-                RecipeCard(navController, listaSignos.get(2))
-                RecipeCard(navController, listaSignos.get(4))
-                RecipeCard(navController, listaSignos.get(6))
-                RecipeCard(navController, listaSignos.get(8))
-                RecipeCard(navController, listaSignos.get(10))
-            }
-        Column(verticalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxHeight()) {
-                RecipeCard(navController, listaSignos.get(1))
-                RecipeCard(navController, listaSignos.get(3))
-                RecipeCard(navController, listaSignos.get(5))
-                RecipeCard(navController, listaSignos.get(7))
-                RecipeCard(navController, listaSignos.get(9))
-                RecipeCard(navController, listaSignos.get(11))
-            }
-
-    }
+        items(listaSignos)
+        {
+            RecipeCard(navController, it)
+        }
 
     }
 }
@@ -95,8 +74,9 @@ fun RecipeCard(navController: NavHostController, horoscopeInfo: HoroscopeInfo) {
     ) {
         Column(modifier = Modifier
             .padding(4.dp)
-            .clickable { navController.navigate("horoscopo_detail")}) {
-            Image(painter = painterResource(id = horoscopeInfo.img),
+            .clickable { navController.navigate("horoscopo_detail/${horoscopeInfo.index}") }) {
+            Image(
+                painter = painterResource(id = horoscopeInfo.img),
                 contentDescription = "imagen"
             )
             Text(text = stringResource(id = horoscopeInfo.name))

@@ -4,39 +4,24 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.reynaldo.horoscapp.domain.model.HoroscopeModel
 import com.reynaldo.horoscopoapp.ui.HoroscopeViewModel
 import com.reynaldo.horoscopoapp.ui.ListaSignosSodicacoScreen
 import com.reynaldo.horoscopoapp.ui.detail.HorocopoDetail
@@ -52,33 +37,37 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("StateFlowValueCalledInComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContent {
 
-            val horoscopeViewModel : HoroscopeViewModel = hiltViewModel()
-            val horoscopoDetailViewModel : HoroscopoDetailViewModel = hiltViewModel()
+            val horoscopeViewModel: HoroscopeViewModel = hiltViewModel()
+            val horoscopoDetailViewModel: HoroscopoDetailViewModel = hiltViewModel()
 
             Scaffold(topBar = {
                 ToolTopBar()
             },
                 bottomBar = { ToolBottomBar() }
-                ){innerPadding ->
+            ) { innerPadding ->
                 val navController = rememberNavController()
-                NavHost(navController= navController, startDestination = "lista_signos_sodicaco_screen" , builder= {
-                    composable("lista_signos_sodicaco_screen",){
-                        ListaSignosSodicacoScreen(navController,innerPadding, horoscopeViewModel.horoscope.value)
-                    }
-                    composable("horoscopo_detail",){
-                        HorocopoDetail(horoscopoDetailViewModel)
-                    }
-
-                } )
-
+                NavHost(
+                    navController = navController,
+                    startDestination = Routes.listaSignos,
+                    builder = {
+                        composable(Routes.listaSignos) {
+                            ListaSignosSodicacoScreen(
+                                navController,
+                                innerPadding,
+                                horoscopeViewModel.horoscope.value
+                            )
+                        }
+                        composable(Routes.horoscopoDetalle) {
+                            val signo = it.arguments?.getString("signo")?:""
+                            HorocopoDetail(horoscopoDetailViewModel,signo)
+                        }
+                    })
             }
-
         }
     }
-
-
 }
 
 
@@ -86,19 +75,14 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun ToolTopBar() {
-
     CenterAlignedTopAppBar(
-
         title = { Text(text = "Horoscopo App") },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = BlackAlpha,
             titleContentColor = Secondary,
         )
     )
-
-
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -107,86 +91,33 @@ fun ToolBottomBar() {
     BottomAppBar(
         contentColor = Secondary,
         containerColor = BlackAlpha,
-        actions = {
-            IconButton(onClick = { /* do something */ }) {
-                Icon(
-                    painterResource(id = R.drawable.ic_horoscope),
-                    contentDescription = "Horosocopo"
-                )
-            }
-            IconButton(onClick = { /* do something */ }) {
-                Icon(
-                    painterResource(id = R.drawable.ic_cards),
-                    contentDescription = "Cards"
-                )
-            }
-            IconButton(onClick = { /* do something */ }) {
-                Icon(
-                    painterResource(id = R.drawable.ic_hand),
-                    contentDescription = "Hands"
-                )
-            }
-        }
-    )
 
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun ScaffoldExample() {
-    var presses by remember { mutableIntStateOf(0) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("Top app bar")
-                }
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Bottom app bar",
-                )
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text =
-                """
-                    This is an example of a scaffold. It uses the Scaffold composable's parameters to create a screen with a simple top app bar, bottom app bar, and floating action button.
+        Spacer(modifier = Modifier.weight(1f, true))
 
-                    It also contains some basic inner content, such as this text.
-
-                    You have pressed the floating action button $presses times.
-                """.trimIndent(),
+        IconButton(onClick = { /* do something */ }) {
+            Icon(
+                painterResource(id = R.drawable.ic_horoscope),
+                contentDescription = "Horosocopo"
             )
         }
+        Spacer(modifier = Modifier.weight(1f, true))
+        IconButton(onClick = { /* do something */ }) {
+            Icon(
+                painterResource(id = R.drawable.ic_cards),
+                contentDescription = "Cards"
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f, true))
+        IconButton(onClick = { /* do something */ }) {
+            Icon(
+                painterResource(id = R.drawable.ic_hand),
+                contentDescription = "Hands"
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f, true))
     }
+
 }
 
 
